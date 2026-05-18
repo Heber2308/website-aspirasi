@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h1>ℹ️ Tentang Website Ini</h1>
+    
+    <div class="about-section">
+        <h2>🎯 Tujuan</h2>
+        <p>Website ini dibuat untuk mengumpulkan aspirasi, keluhan, dan saran dari mahasiswa. Data yang terkumpul akan digunakan untuk <strong>melatih model kecerdasan buatan (AI)</strong> yang dapat mendeteksi sentimen secara otomatis.</p>
+    </div>
+
+    <div class="about-section">
+        <h2>🤖 AI Sentimen</h2>
+        <p>Model AI yang dilatih akan mampu mengklasifikasikan teks aspirasi ke dalam 3 kategori:</p>
+        <ul>
+            <li><span class="sentimen-badge sentimen-positif">Positif</span> - Aspirasi bernada positif, apresiasi, pujian</li>
+            <li><span class="sentimen-badge sentimen-negatif">Negatif</span> - Keluhan, kritik, kekecewaan</li>
+            <li><span class="sentimen-badge sentimen-netral">Netral</span> - Informatif, pertanyaan, netral</li>
+        </ul>
+    </div>
+
+    <div class="about-section">
+        <h2>📊 Statistik</h2>
+        <p>Saat ini sudah terkumpul <strong>{{ total_aspirasi }}</strong> aspirasi mahasiswa.</p>
+    </div>
+
+    <a href="/" class="btn btn-primary">Mulai Kirim Aspirasi</a>
+</div>
+{% endblock %}

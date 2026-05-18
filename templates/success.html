@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container success-container">
+    <div class="success-icon">✅</div>
+    <h1>Aspirasi Terkirim!</h1>
+    <p>Terima kasih <strong>{{ nama }}</strong>! Aspirasimu telah tercatat dengan nomor <strong>#{{ nomor }}</strong>.</p>
+    
+    <div class="aspirasi-card">
+        <div class="aspirasi-header">
+            <span class="aspirasi-nomor">#{{ nomor }}</span>
+            <span class="aspirasi-nama">{{ nama }}</span>
+            <span class="aspirasi-waktu">Baru saja</span>
+        </div>
+        <p class="aspirasi-teks">"{{ teks }}"</p>
+    </div>
+
+    <div class="action-buttons">
+        <a href="/" class="btn btn-primary">← Kirim Aspirasi Lagi</a>
+        <a href="/aspirasi" class="btn btn-secondary">Lihat Semua Aspirasi</a>
+    </div>
+</div>
+{% endblock %}

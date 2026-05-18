@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Aspirasi Mahasiswa</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="admin-body">
+    <!-- ADMIN NAVBAR -->
+    <nav class="admin-navbar">
+        <div class="admin-nav-container">
+            <span class="admin-nav-logo">⚙️ Admin Panel</span>
+            <div class="admin-nav-links">
+                <a href="/" target="_blank" class="admin-nav-link">Lihat Website</a>
+                <a href="/admin/logout" class="admin-nav-link admin-nav-logout">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="admin-container">
+        <!-- HEADER -->
+        <div class="admin-header">
+            <h1>📊 Dashboard Admin</h1>
+            <p>Kelola aspirasi dan beri label sentimen</p>
+        </div>
+
+        <!-- FLASH MESSAGES -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash-message flash-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <!-- STATISTIK -->
+        <div class="admin-stats">
+            <div class="stat-card stat-total">
+                <h3>{{ stats.total }}</h3>
+                <p>Total Aspirasi</p>
+            </div>
+            <div class="stat-card stat-positif">
+                <h3>{{ stats.positif }}</h3>
+                <p>Positif ✅</p>
+            </div>
+            <div class="stat-card stat-negatif">
+                <h3>{{ stats.negatif }}</h3>
+                <p>Negatif ❌</p>
+            </div>
+            <div class="stat-card stat-netral">
+                <h3>{{ stats.netral }}</h3>
+                <p>Netral 😐</p>
+            </div>
+            <div class="stat-card stat-belum">
+                <h3>{{ stats.belum_dilabeli }}</h3>
+                <p>Belum Dilabeli ⚠️</p>
+            </div>
+        </div>
+
+        <!-- EXPORT BUTTONS -->
+        <div class="admin-export">
+            <a href="/admin/export-csv" class="btn-export btn-export-primary">📥 Download Dataset (Labeled)</a>
+            <a href="/admin/export-semua-csv" class="btn-export btn-export-secondary">📥 Download Semua Data</a>
+        </div>
+
+        <!-- FILTER & SEARCH -->
+        <div class="admin-filter">
+            <form method="GET" action="{{ url_for('admin_dashboard') }}" class="filter-form">
+                <select name="sentimen" class="filter-select">
+                    <option value="semua" {% if filter_sentimen == 'semua' %}selected{% endif %}>Semua Sentimen</option>
+                    <option value="belum_dilabeli" {% if filter_sentimen == 'belum_dilabeli' %}selected{% endif %}>Belum Dilabeli</option>
+                    <option value="positif" {% if filter_sentimen == 'positif' %}selected{% endif %}>Positif</option>
+                    <option value="negatif" {% if filter_sentimen == 'negatif' %}selected{% endif %}>Negatif</option>
+                    <option value="netral" {% if filter_sentimen == 'netral' %}selected{% endif %}>Netral</option>
+                </select>
+                <input type="text" name="search" placeholder="🔍 Cari aspirasi..." value="{{ search }}" class="filter-search">
+                <button type="submit" class="btn-filter">Filter</button>
+            </form>
+        </div>
+
+        <!-- TABEL ASPIRASI -->
+        <div class="admin-table-wrapper">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Nama</th>
+                        <th>Aspirasi</th>
+                        <th>Sentimen</th>
+                        <th>Waktu</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if aspirasi_list %}
+                        {% for a in aspirasi_list %}
+                        <tr>
+                            <td class="td-nomor">#{{ a.nomor }}</td>
+                            <td class="td-nama">{{ a.nama }}</td>
+                            <td class="td-teks">{{ a.teks[:150] }}{% if a.teks|length > 150 %}...{% endif %}</td>
+                            <td class="td-sentimen">
+                                <span class="sentimen-badge sentimen-{{ a.sentimen }}">
+                                    {{ a.sentimen.replace('_', ' ').title() }}
+                                </span>
+                            </td>
+                            <td class="td-waktu">{{ a.waktu.strftime('%d/%m/%Y %H:%M') }}</td>
+                            <td class="td-aksi">
+                                <!-- Form Label -->
+                                <form method="POST" action="/admin/label/{{ a.id }}" class="label-form">
+                                    <select name="sentimen" class="label-select" onchange="this.form.submit()">
+                                        <option value="">-- Label --</option>
+                                        <option value="positif" {% if a.sentimen == 'positif' %}selected{% endif %}>Positif</option>
+                                        <option value="negatif" {% if a.sentimen == 'negatif' %}selected{% endif %}>Negatif</option>
+                                        <option value="netral" {% if a.sentimen == 'netral' %}selected{% endif %}>Netral</option>
+                                    </select>
+                                </form>
+                                <!-- Tombol Hapus -->
+                                <form method="POST" action="/admin/hapus/{{ a.id }}" class="hapus-form" onsubmit="return confirm('Yakin hapus aspirasi #{{ a.nomor }}?')">
+                                    <button type="submit" class="btn-hapus">🗑️</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="6" class="td-empty">Tidak ada aspirasi ditemukan.</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- PAGINATION -->
+        {% if total_pages > 1 %}
+        <div class="pagination">
+            {% if current_page > 1 %}
+                <a href="{{ url_for('admin_dashboard', page=current_page-1, sentimen=filter_sentimen, search=search) }}" class="page-link">← Sebelumnya</a>
+            {% endif %}
+            
+            {% for p in range(1, total_pages + 1) %}
+                {% if p == current_page %}
+                    <span class="page-link active">{{ p }}</span>
+                {% else %}
+                    <a href="{{ url_for('admin_dashboard', page=p, sentimen=filter_sentimen, search=search) }}" class="page-link">{{ p }}</a>
+                {% endif %}
+            {% endfor %}
+            
+            {% if current_page < total_pages %}
+                <a href="{{ url_for('admin_dashboard', page=current_page+1, sentimen=filter_sentimen, search=search) }}" class="page-link">Selanjutnya →</a>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>

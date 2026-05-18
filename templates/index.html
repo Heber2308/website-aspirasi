@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h1>📢 Sampaikan Aspirasimu</h1>
+    <p class="subtitle">Suaramu penting! Aspirasi ini akan digunakan untuk melatih AI pendeteksi sentimen (positif, negatif, netral).</p>
+
+    <form action="/kirim" method="POST" class="aspirasi-form">
+        <div class="form-group">
+            <label for="nama">Nama <span class="optional">(opsional)</span></label>
+            <input type="text" id="nama" name="nama" placeholder="Tulis namamu..." maxlength="100">
+            <small class="form-hint">Maksimal 100 karakter. Kosongkan untuk anonim.</small>
+        </div>
+
+        <div class="form-group">
+            <label for="teks">Aspirasi / Keluhan / Saran <span class="required">*</span></label>
+            <textarea id="teks" name="teks" rows="5" placeholder="Tulis aspirasimu di sini... (minimal 10 karakter)" required minlength="10" maxlength="2000"></textarea>
+            <small class="form-hint">
+                <span id="charCount">0</span> / 2000 karakter &nbsp;|&nbsp; Minimal 10 karakter
+            </small>
+        </div>
+
+        <button type="submit">🚀 Kirim Aspirasi</button>
+    </form>
+</div>
+
+<script>
+    // Character counter
+    const textarea = document.getElementById('teks');
+    const charCount = document.getElementById('charCount');
+    
+    textarea.addEventListener('input', function() {
+        charCount.textContent = this.value.length;
+        if (this.value.length > 2000) {
+            charCount.style.color = 'red';
+        } else if (this.value.length < 10) {
+            charCount.style.color = 'orange';
+        } else {
+            charCount.style.color = '#666';
+        }
+    });
+</script>
+{% endblock %}
